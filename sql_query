@@ -1,0 +1,47 @@
+#standardSQL
+SELECT
+  B.*
+FROM (
+  SELECT
+    Q.id AS Q_ID,
+    A.id AS A_ID,
+    U.reputation AS U_REPUTATION,
+    Q.title AS Q_Title,
+    Q.body AS Q_BODY,
+    A.body AS A_BODY,
+    C.text AS C_TEXT,
+    C.user_display_name AS USER_NAME,
+    Q.accepted_answer_id AS Accepted_Answer_ID
+  FROM
+    `bigquery-public-data.stackoverflow.posts_questions` AS Q
+  LEFT JOIN
+    `bigquery-public-data.stackoverflow.posts_answers` AS A
+  ON
+    A.parent_id = Q.id
+  LEFT JOIN
+    `bigquery-public-data.stackoverflow.comments` AS C
+  ON
+    C.post_id = A.id
+  LEFT JOIN
+    `bigquery-public-data.stackoverflow.users` AS U
+  ON
+    A.owner_user_id = U.id
+    -- ORDER BY Q.creation_date DESC
+    ) AS B
+INNER JOIN (
+  SELECT
+    B1.id,
+    B1.rowid
+  FROM (
+    SELECT
+      Q.id,
+      ROW_NUMBER() OVER(ORDER BY Q.creation_date DESC) AS rowid
+    FROM
+      `bigquery-public-data.stackoverflow.posts_questions` AS Q
+    WHERE
+      Q.accepted_answer_id > 0 
+      AND Q.comment_count > 0 ) AS B1
+  WHERE
+    B1.rowid < 100000 ) AS B2
+ON
+  B.Q_ID=B2.id
