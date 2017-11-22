@@ -1,7 +1,6 @@
 import pandas as pd
 import numpy as np
 import os
-import nltk
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 
 SO_DATASET = os.path.join(os.path.dirname(__file__), 'data', 'dataset.csv.tar.gz')
