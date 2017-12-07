@@ -9,19 +9,15 @@ FROM (
     Q.title AS Q_Title,
     Q.body AS Q_BODY,
     A.body AS A_BODY,
-    C.text AS C_TEXT,
-    C.user_display_name AS USER_NAME,
-    Q.accepted_answer_id AS Accepted_Answer_ID
+    UNIX_SECONDS(A.creation_date) - UNIX_SECONDS(Q.creation_date) AS TIME_DIFF,
+    Q.accepted_answer_id AS Accepted_Answer_ID,
+    A.score AS A_SCORE
   FROM
     `bigquery-public-data.stackoverflow.posts_questions` AS Q
   LEFT JOIN
     `bigquery-public-data.stackoverflow.posts_answers` AS A
   ON
     A.parent_id = Q.id
-  LEFT JOIN
-    `bigquery-public-data.stackoverflow.comments` AS C
-  ON
-    C.post_id = A.id
   LEFT JOIN
     `bigquery-public-data.stackoverflow.users` AS U
   ON
@@ -45,3 +41,5 @@ INNER JOIN (
     B1.rowid < 100000 ) AS B2
 ON
   B.Q_ID=B2.id
+
+
