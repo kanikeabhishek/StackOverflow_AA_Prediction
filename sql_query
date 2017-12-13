@@ -4,14 +4,13 @@ SELECT
 FROM (
   SELECT
     Q.id AS Q_ID,
+    Q.tags AS TAG,
     A.id AS A_ID,
     U.reputation AS U_REPUTATION,
     Q.title AS Q_Title,
     Q.body AS Q_BODY,
     A.body AS A_BODY,
-    UNIX_SECONDS(A.creation_date) - UNIX_SECONDS(Q.creation_date) AS TIME_DIFF,
-    Q.accepted_answer_id AS Accepted_Answer_ID,
-    A.score AS A_SCORE
+    Q.accepted_answer_id AS Accepted_Answer_ID
   FROM
     `bigquery-public-data.stackoverflow.posts_questions` AS Q
   LEFT JOIN
@@ -36,10 +35,9 @@ INNER JOIN (
       `bigquery-public-data.stackoverflow.posts_questions` AS Q
     WHERE
       Q.accepted_answer_id > 0 
-      AND Q.comment_count > 0 ) AS B1
+      AND Q.comment_count > 0 AND (Q.tags = "python-2.x" OR Q.tags = "python" OR Q.tags = "python-3.x")) AS B1
   WHERE
-    B1.rowid < 100000 ) AS B2
+    B1.rowid < 200000) AS B2
+
 ON
   B.Q_ID=B2.id
-
-
